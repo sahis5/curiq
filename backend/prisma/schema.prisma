@@ -1,0 +1,136 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id          String   @id @default(uuid())
+  name        String
+  dob         DateTime
+  gender      String
+  bloodGroup  String?
+  phone       String
+  email       String?
+  allergies   String?
+  createdAt   DateTime @default(now())
+
+  appointments Appointment[]
+  emrRecords   EmrRecord[]
+  invoices     BillingInvoice[]
+  notifications Notification[]
+}
+
+model Doctor {
+  id                 String   @id @default(uuid())
+  name               String
+  specialization     String
+  departmentId       String
+  avgConsultationTime Int      @default(600) // in seconds, default 10 mins
+  isAvailable        Boolean  @default(true)
+
+  appointments Appointment[]
+  queueTokens  QueueToken[]
+  emrRecords   EmrRecord[]
+}
+
+model Appointment {
+  id             String   @id @default(uuid())
+  patientId      String
+  doctorId       String
+  slotTime       DateTime
+  tokenNumber    Int
+  status         String   // e.g. SCHEDULED, COMPLETED, CANCELLED
+  bookingChannel String   // APP, DESK, TELEMEDICINE
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+
+  queueToken QueueToken?
+  invoices   BillingInvoice[]
+}
+
+model QueueToken {
+  id            String   @id @default(uuid())
+  appointmentId String   @unique
+  doctorId      String
+  status        String   // WAITING, CALLED, IN_CONSULTATION, COMPLETED, SKIPPED
+  queuePosition Int
+  calledAt      DateTime?
+  startTime     DateTime?
+  endTime       DateTime?
+  durationSec   Int?
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  doctor      Doctor      @relation(fields: [doctorId], references: [id])
+}
+
+model EmrRecord {
+  id         String   @id @default(uuid())
+  patientId  String
+  doctorId   String
+  visitDate  DateTime @default(now())
+  soapNotes  String?
+  icd10Code  String?
+  vitalsJson Json?
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+
+  prescriptions Prescription[]
+  labOrders     LabOrder[]
+}
+
+model Prescription {
+  id                     String   @id @default(uuid())
+  emrRecordId            String
+  medicinesJson          Json
+  drugCheckPassed        Boolean  @default(false)
+  dispatchedToPharmacy   Boolean  @default(false)
+  createdAt              DateTime @default(now())
+
+  emrRecord EmrRecord @relation(fields: [emrRecordId], references: [id])
+}
+
+model LabOrder {
+  id           String   @id @default(uuid())
+  emrRecordId  String
+  testName     String
+  urgency      String   // ROUTINE, URGENT, STAT
+  status       String   // PENDING, COLLECTED, COMPLETED
+  resultUrl    String?
+  criticalFlag Boolean  @default(false)
+
+  emrRecord EmrRecord @relation(fields: [emrRecordId], references: [id])
+}
+
+model BillingInvoice {
+  id               String   @id @default(uuid())
+  patientId        String
+  appointmentId    String
+  itemsJson        Json
+  totalAmount      Float
+  paymentStatus    String   // PENDING, PAID, FAILED
+  insuranceClaimId String?
+
+  patient     Patient     @relation(fields: [patientId], references: [id])
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  patientId String
+  type      String   // SMS, PUSH, EMAIL
+  message   String
+  channel   String
+  sentAt    DateTime?
+  readAt    DateTime?
+
+  patient Patient @relation(fields: [patientId], references: [id])
+}
