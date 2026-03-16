@@ -25,6 +25,8 @@ model Patient {
   emrRecords   EmrRecord[]
   invoices     BillingInvoice[]
   notifications Notification[]
+  waitlists    Waitlist[]
+  reviews      Review[]
 }
 
 model Doctor {
@@ -32,28 +34,39 @@ model Doctor {
   name               String
   specialization     String
   departmentId       String
+  experienceYears    Int      @default(0)
+  about              String?  @db.Text
+  consultationFee    Float    @default(0.0)
   avgConsultationTime Int      @default(600) // in seconds, default 10 mins
   isAvailable        Boolean  @default(true)
 
   appointments Appointment[]
   queueTokens  QueueToken[]
   emrRecords   EmrRecord[]
+  schedules    DoctorSchedule[]
+  waitlists    Waitlist[]
+  reviews      Review[]
 }
 
 model Appointment {
-  id             String   @id @default(uuid())
-  patientId      String
-  doctorId       String
-  slotTime       DateTime
-  tokenNumber    Int
-  status         String   // e.g. SCHEDULED, COMPLETED, CANCELLED
-  bookingChannel String   // APP, DESK, TELEMEDICINE
+  id               String    @id @default(uuid())
+  patientId        String
+  doctorId         String
+  slotTime         DateTime
+  tokenNumber      Int
+  status           String    // e.g. PENDING, CONFIRMED, CANCELLED, LATE_CANCEL, NO_SHOW, COMPLETED
+  bookingChannel   String    // APP, DESK, TELEMEDICINE, WHATSAPP, WEB
+  consultationMode String    @default("IN_PERSON") // IN_PERSON, VIDEO
+  paymentStatus    String    @default("PENDING") // PENDING, PREPAID, PAY_AT_CLINIC
+  softLockUntil    DateTime?
+  cancellationCode String?
 
   patient Patient @relation(fields: [patientId], references: [id])
   doctor  Doctor  @relation(fields: [doctorId], references: [id])
 
   queueToken QueueToken?
   invoices   BillingInvoice[]
+  review     Review?
 }
 
 model QueueToken {
@@ -133,4 +146,51 @@ model Notification {
   readAt    DateTime?
 
   patient Patient @relation(fields: [patientId], references: [id])
+}
+
+model DoctorSchedule {
+  id               String   @id @default(uuid())
+  doctorId         String
+  dayOfWeek        Int      // 0=Sun, 1=Mon, ..., 6=Sat
+  startTime        String   // "09:00"
+  endTime          String   // "13:00"
+  slotDurationMins Int      @default(15)
+  maxPatients      Int      @default(20)
+  sessionType      String   // MORNING, EVENING
+  modes            String   // IN_PERSON, VIDEO, BOTH
+  isActive         Boolean  @default(true)
+
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+}
+
+model Waitlist {
+  id            String   @id @default(uuid())
+  patientId     String
+  doctorId      String
+  requestedDate DateTime // Target date the patient wants
+  urgencyScore  Int      @default(0) // 10 if urgent, +loyalty points
+  status        String   // WAITING, NOTIFIED, ACCEPTED, EXPIRED, CANCELLED
+  notifiedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+}
+
+model Review {
+  id            String   @id @default(uuid())
+  patientId     String
+  doctorId      String
+  appointmentId String   @unique
+  rating        Float    // 1.0 to 5.0
+  waitTime      Int      // 1-5 score
+  behaviour     Int      // 1-5 score
+  treatment     Int      // 1-5 score
+  recommend     Boolean
+  comment       String?  @db.Text
+  createdAt     DateTime @default(now())
+
+  patient     Patient     @relation(fields: [patientId], references: [id])
+  doctor      Doctor      @relation(fields: [doctorId], references: [id])
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
 }
