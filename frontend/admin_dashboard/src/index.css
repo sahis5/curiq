@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-background text-gray-100 font-sans antialiased;
+  }
+}
+
+.metric-card {
+  @apply bg-surface border border-slate-700 p-6 rounded-2xl shadow-lg relative overflow-hidden;
+}
+
+.metric-card::before {
+  content: '';
+  @apply absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-2xl -mr-10 -mt-10;
+}

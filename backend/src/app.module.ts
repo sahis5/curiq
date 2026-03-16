@@ -10,9 +10,10 @@ import { PrescriptionModule } from './prescription/prescription.module';
 import { LabModule } from './lab/lab.module';
 import { BillingModule } from './billing/billing.module';
 import { NotificationModule } from './notification/notification.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
-  imports: [AuthModule, QueueModule, PrismaModule, AppointmentModule, EmrModule, PrescriptionModule, LabModule, BillingModule, NotificationModule],
+  imports: [AuthModule, QueueModule, PrismaModule, AppointmentModule, EmrModule, PrescriptionModule, LabModule, BillingModule, NotificationModule, AnalyticsModule],
   controllers: [AppController],
   providers: [AppService],
 })
