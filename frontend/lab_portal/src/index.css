@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-background text-gray-900 font-sans antialiased;
+  }
+}
+
+.critical-badge {
+  @apply px-3 py-1 bg-red-100 text-red-800 text-xs font-bold rounded-full uppercase tracking-wider animate-pulse;
+}
