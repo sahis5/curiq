@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { QueueGateway } from './queue.gateway';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class QueueService {
   constructor(
     private prisma: PrismaService,
-    private queueGateway: QueueGateway
+    private queueGateway: QueueGateway,
+    private notificationService: NotificationService
   ) {}
 
   async calculateDoctorAvgTime(doctorId: string): Promise<number> {
@@ -74,18 +76,27 @@ export class QueueService {
           calledAt: now
         }
       });
+      // Notify the next patient
+      await this.notificationService.sendToPatient(nextToken.id, 'PUSH', 'It is your turn! Please proceed to the Doctor\'s room.');
     }
 
     // 4. Broadcast update via WebSockets
-    this.broadcastQueueUpdate(doctorId, avgTime, nextTokens);
+    await this.broadcastQueueUpdate(doctorId, avgTime, nextTokens);
   }
 
-  private broadcastQueueUpdate(doctorId: string, avgTime: number, remainingTokens: any[]) {
+  private async broadcastQueueUpdate(doctorId: string, avgTime: number, remainingTokens: any[]) {
     const queueData = remainingTokens.map((t, i) => ({
       tokenId: t.id,
       position: t.queuePosition,
       etaSec: i * avgTime
     }));
+
+    // Trigger alerts for patients nearing the front (positions 1-5)
+    for (const data of queueData) {
+      if (data.position > 0 && data.position <= 5) {
+        await this.notificationService.sendQueueAlert(remainingTokens.find(t => t.id === data.tokenId).id, data.position);
+      }
+    }
 
     this.queueGateway.broadcastQueueUpdate(doctorId, queueData);
   }

@@ -8,9 +8,11 @@ import { AppointmentModule } from './appointment/appointment.module';
 import { EmrModule } from './emr/emr.module';
 import { PrescriptionModule } from './prescription/prescription.module';
 import { LabModule } from './lab/lab.module';
+import { BillingModule } from './billing/billing.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
-  imports: [AuthModule, QueueModule, PrismaModule, AppointmentModule, EmrModule, PrescriptionModule, LabModule],
+  imports: [AuthModule, QueueModule, PrismaModule, AppointmentModule, EmrModule, PrescriptionModule, LabModule, BillingModule, NotificationModule],
   controllers: [AppController],
   providers: [AppService],
 })
