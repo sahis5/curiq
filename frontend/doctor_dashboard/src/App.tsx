@@ -140,7 +140,7 @@ const DoctorDashboard = ({ user, handleLogout }: { user?: any; handleLogout: () 
       >
         <div>
           <div className="h-14 flex items-center justify-center border-b border-white/10">
-            <h1 className="text-lg font-bold text-primary-400">MediFlow</h1>
+            <h1 className="text-lg font-bold text-primary-400">Curiq</h1>
           </div>
           <nav className="mt-4 px-3 flex flex-col gap-1">
             <button onClick={() => setActiveTab('queue')} className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-sm w-full text-left ${activeTab === 'queue' ? 'bg-primary-600 text-white' : 'text-slate-400 hover:bg-white/5'}`}>

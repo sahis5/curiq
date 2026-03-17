@@ -45,7 +45,7 @@ const Dashboard = ({ handleLogout }: { handleLogout: () => void }) => {
       >
         <div>
           <div className="h-14 flex items-center justify-center border-b border-gray-200">
-            <h1 className="text-lg font-bold text-primary-600">MediFlow</h1>
+            <h1 className="text-lg font-bold text-primary-600">Curiq</h1>
           </div>
           <nav className="mt-4 px-3">
             <a href="#" className="flex items-center gap-3 px-4 py-2.5 bg-primary-50 text-primary-700 rounded-lg font-medium text-sm">

@@ -50,7 +50,7 @@ const Header = () => {
   return (
     <header className="absolute top-0 w-full z-50 bg-transparent flex justify-between items-center px-8 py-6">
        <button onClick={() => navigate('/')} className="text-2xl font-black text-white tracking-tight flex items-center gap-2 drop-shadow-md">
-          <CheckCircle2 className="w-8 h-8 text-primary-300" /> MediFlow
+          <CheckCircle2 className="w-8 h-8 text-primary-300" /> Curiq
        </button>
        <div className="flex items-center gap-4">
           {user ? (
@@ -120,7 +120,7 @@ const AuthModal = () => {
       <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden">
          <div className="p-8">
             <h2 className="text-2xl font-bold text-slate-800 mb-1">{authMode === 'login' ? 'Welcome Back' : 'Create an Account'}</h2>
-            <p className="text-slate-500 text-sm mb-6">{authMode === 'login' ? 'Sign in to access your appointments and records.' : 'Join MediFlow to book doctors and view your AI health profile.'}</p>
+            <p className="text-slate-500 text-sm mb-6">{authMode === 'login' ? 'Sign in to access your appointments and records.' : 'Join Curiq to book doctors and view your AI health profile.'}</p>
             
             {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm mb-4 font-medium flex items-center gap-2"><AlertCircle className="w-4 h-4" /> {error}</div>}
 

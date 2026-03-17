@@ -24,6 +24,6 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', '..', 'public'));
 
   await app.listen(process.env.PORT ?? 3000);
-  console.log(`\n🚀 MediFlow Platform Gateway → http://localhost:3000\n`);
+  console.log('🚀 Curiq Platform Gateway → http://localhost:3000');
 }
 bootstrap();

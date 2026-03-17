@@ -9,7 +9,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     PrismaModule,
     JwtModule.register({
       global: true,
-      secret: 'mediflow-super-secret-key-2026', // In production use Env variables
+      secret: 'curiq-super-secret-key-2026', // In production use Env variables
       signOptions: { expiresIn: '1d' },
     }),
   ],

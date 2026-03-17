@@ -1,6 +1,6 @@
-# MediFlow SaaS Platform
+# Curiq SaaS Platform
 
-Welcome to the MediFlow Monorepo! This platform consists of a NestJS backend, a Python AI engine, 6 React frontend applications, and a Dockerized infrastructure layer (PostgreSQL + Redis).
+Welcome to the Curiq Monorepo! This platform consists of a NestJS backend, a Python AI engine, 6 React frontend applications, and a Dockerized infrastructure layer (PostgreSQL + Redis).
 
 ## Prerequisites
 - **Node.js** v20+ (required for Tailwind CSS v4)
@@ -12,7 +12,7 @@ Welcome to the MediFlow Monorepo! This platform consists of a NestJS backend, a 
 ## 🚀 Run Everything in a Single Command
 
 ```bash
-cd mediflow_platform
+cd curiq_platform
 ./start.sh
 ```
 
@@ -23,7 +23,7 @@ This single script will:
 4. Start the **Python AI Engine** on `:8000`
 5. Start all **6 React Frontends** on `:5173` – `:5178`
 
-Then open **[http://localhost:3000](http://localhost:3000)** — the **Unified MediFlow Gateway** with role-based cards linking to every dashboard.
+Then open **[http://localhost:3000](http://localhost:3000)** — the **Unified Curiq Gateway** with role-based cards linking to every dashboard.
 
 ---
 
@@ -33,7 +33,7 @@ If you prefer to start things individually:
 
 ### 1. Infrastructure (Databases)
 ```bash
-cd mediflow_platform
+cd curiq_platform
 docker-compose up -d
 ```
 

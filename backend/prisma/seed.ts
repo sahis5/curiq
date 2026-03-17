@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding MediFlow database...');
+  console.log('🌱 Seeding Curiq database...');
 
   // Clean existing data
   await prisma.staff.deleteMany();

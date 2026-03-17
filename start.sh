@@ -1,6 +1,6 @@
 #!/bin/bash
 # ──────────────────────────────────────────────────────
-#  MediFlow Platform — One-Shot Startup Script
+#  Curiq Platform — One-Shot Startup Script
 #  Starts: Docker → Backend → AI Engine → 6 Frontends
 # ──────────────────────────────────────────────────────
 
@@ -8,7 +8,7 @@ set -e
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo ""
-echo "⚕  MediFlow Platform — Starting All Services..."
+echo "⚕  Curiq Platform — Starting All Services..."
 echo "──────────────────────────────────────────────────"
 
 # 1. Infrastructure
@@ -51,7 +51,7 @@ done
 
 echo ""
 echo "══════════════════════════════════════════════════"
-echo "✅  All MediFlow services are starting!"
+echo "✅  All Curiq services are starting!"
 echo ""
 echo "  🚀  Gateway:      http://localhost:3000"
 echo "  📡  Backend API:   http://localhost:3000"
