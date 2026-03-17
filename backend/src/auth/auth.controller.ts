@@ -6,9 +6,21 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
-  @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
-    // Extract userId and role from request
-    return this.authService.login(signInDto.userId, signInDto.role);
+  @Post('patient/login')
+  patientLogin(@Body() body: Record<string, any>) {
+    return this.authService.patientLogin(body.email, body.password);
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @Post('patient/signup')
+  patientSignup(@Body() body: Record<string, any>) {
+    return this.authService.patientSignup(body);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('staff/login')
+  staffLogin(@Body() body: Record<string, any>) {
+    return this.authService.staffLogin(body.email, body.password, body.type || 'STAFF');
   }
 }
+

@@ -17,7 +17,8 @@ model Patient {
   gender      String
   bloodGroup  String?
   phone       String
-  email       String?
+  email       String?  @unique
+  password    String?
   allergies   String?
   createdAt   DateTime @default(now())
 
@@ -32,6 +33,8 @@ model Patient {
 model Doctor {
   id                 String   @id @default(uuid())
   name               String
+  email              String?  @unique
+  password           String?
   specialization     String
   departmentId       String
   experienceYears    Int      @default(0)
@@ -193,4 +196,12 @@ model Review {
   patient     Patient     @relation(fields: [patientId], references: [id])
   doctor      Doctor      @relation(fields: [doctorId], references: [id])
   appointment Appointment @relation(fields: [appointmentId], references: [id])
+}
+
+model Staff {
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  role     String // RECEPTIONIST, PHARMACIST, LAB_TECH, ADMIN
 }

@@ -1,148 +1,234 @@
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Users, Activity, LogOut, Clock, Plus, Bell } from 'lucide-react';
 
-const Dashboard = () => {
+const API = 'http://localhost:3000';
+
+const Dashboard = ({ handleLogout }: { handleLogout: () => void }) => {
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAppointments = async () => {
+    try {
+      const res = await fetch(`${API}/appointments/today`);
+      const data = await res.json();
+      setAppointments(data);
+    } catch (e) { console.error('Failed to fetch appointments', e); }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchAppointments();
+    // Poll every 5 seconds for real-time sync
+    const interval = setInterval(fetchAppointments, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Group appointments by doctor
+  const doctorMap = new Map<string, { doctor: any; appointments: any[] }>();
+  appointments.forEach((apt) => {
+    if (!doctorMap.has(apt.doctorId)) {
+      doctorMap.set(apt.doctorId, { doctor: apt.doctor, appointments: [] });
+    }
+    doctorMap.get(apt.doctorId)!.appointments.push(apt);
+  });
+
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
-      {/* Sidebar Navigation */}
+    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
+      {/* Sidebar */}
       <motion.aside 
         initial={{ x: -250 }}
         animate={{ x: 0 }}
-        className="w-64 bg-white border-r border-gray-200 flex flex-col justify-between"
+        transition={{ type: "spring", stiffness: 200, damping: 20 }}
+        className="w-60 bg-white border-r border-slate-200 flex flex-col justify-between z-20"
       >
         <div>
-          <div className="h-16 flex items-center justify-center border-b border-gray-200">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-teal-500 bg-clip-text text-transparent">
-              MediFlow
-            </h1>
+          <div className="h-14 flex items-center justify-center border-b border-gray-200">
+            <h1 className="text-lg font-bold text-primary-600">MediFlow</h1>
           </div>
-          <nav className="mt-6 px-4">
-            <a href="#" className="flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-700 rounded-xl font-medium transition-colors">
-              <Activity className="w-5 h-5" />
-              Live Queue
+          <nav className="mt-4 px-3">
+            <a href="#" className="flex items-center gap-3 px-4 py-2.5 bg-primary-50 text-primary-700 rounded-lg font-medium text-sm">
+              <Activity className="w-4 h-4" /> Live Queue
             </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl font-medium transition-colors mt-2">
-              <Users className="w-5 h-5" />
-              Patients
+            <a href="#" className="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 rounded-lg font-medium text-sm mt-1">
+              <Users className="w-4 h-4" /> Patients
             </a>
           </nav>
         </div>
-        <div className="p-4 border-t border-gray-200">
-          <button className="flex items-center gap-3 px-4 py-3 w-full text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl font-medium transition-colors">
-            <LogOut className="w-5 h-5" />
-            Logout
+        <div className="p-3 border-t border-gray-200">
+          <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-2.5 w-full text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-lg font-medium text-sm">
+            <LogOut className="w-4 h-4" /> Logout
           </button>
         </div>
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col relative overflow-hidden">
-        {/* Header */}
-        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
-          <h2 className="text-xl font-semibold text-gray-800">Live Reception Desk</h2>
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-10">
+          <h2 className="text-lg font-bold text-slate-800">Live Reception Desk</h2>
           <div className="flex items-center gap-4">
-             <button className="relative p-2 text-gray-400 hover:text-primary-600 transition-colors">
-               <Bell className="w-6 h-6" />
-               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+             <button className="relative p-2 text-slate-400 hover:text-primary-600">
+               <Bell className="w-5 h-5" />
+               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
              </button>
-             <div className="flex items-center gap-3 border-l border-gray-200 pl-4">
-               <div className="w-9 h-9 bg-gradient-to-br from-primary-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold shadow-sm">
-                 R
-               </div>
-               <span className="font-medium text-gray-700">Receptionist Desk 1</span>
+             <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
+               <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center text-white text-sm font-bold">R</div>
+               <span className="font-semibold text-sm text-slate-700">Reception Desk 1</span>
              </div>
           </div>
         </header>
 
-        {/* Dashboard Content */}
-        <div className="flex-1 overflow-y-auto p-8 bg-[#f8fafc]">
-          {/* Top Actions */}
-          <div className="flex justify-between items-center mb-8">
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex justify-between items-end mb-6">
              <div>
-               <h3 className="text-2xl font-bold text-gray-900">Queue Monitor</h3>
-               <p className="text-gray-500 mt-1">Real-time dynamic ETA updates across all departments.</p>
+               <h3 className="text-2xl font-bold text-slate-900 mb-1">Queue Monitor</h3>
+               <p className="text-slate-500 text-sm">{appointments.length} appointments today • Auto-refreshes every 5s</p>
              </div>
-             <motion.button 
-               whileHover={{ scale: 1.02 }}
-               whileTap={{ scale: 0.98 }}
-               className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2.5 rounded-xl font-medium shadow-lg shadow-primary-500/30 flex items-center gap-2 transition-all"
-             >
-               <Plus className="w-5 h-5" />
-               New Patient Walk-in
-             </motion.button>
+             <button className="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2">
+               <Plus className="w-4 h-4" /> New Walk-in
+             </button>
           </div>
 
-          {/* Grid of Doctors/Queues */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            
-            {/* Queue Card Example */}
-            <motion.div 
-               initial={{ opacity: 0, y: 20 }}
-               animate={{ opacity: 1, y: 0 }}
-               className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
-            >
-              <div className="p-5 border-b border-gray-50 flex justify-between items-start">
-                <div>
-                  <h4 className="text-lg font-bold text-gray-900">Dr. Sarah Jenkins</h4>
-                  <p className="text-sm text-primary-600 font-medium">Cardiology</p>
-                </div>
-                <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide">
-                  Available
-                </span>
-              </div>
-              
-              <div className="p-5 bg-gray-50/50">
-                 <div className="flex justify-between items-center mb-4">
-                   <div className="text-sm text-gray-500 font-medium flex items-center gap-1.5">
-                     <Users className="w-4 h-4" /> 5 Waiting
-                   </div>
-                   <div className="text-sm text-gray-500 font-medium flex items-center gap-1.5 text-amber-600">
-                     <Clock className="w-4 h-4" /> Avg: 12m
-                   </div>
-                 </div>
-                 
-                 {/* Current Patient */}
-                 <div className="bg-white rounded-xl p-4 border border-blue-100 shadow-sm relative overflow-hidden mb-3">
-                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
-                   <div className="flex justify-between items-center">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full"></div>
+            </div>
+          ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {Array.from(doctorMap.values()).map(({ doctor, appointments: docApts }) => (
+              <motion.div 
+                key={doctor.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+              >
+                <div className="p-4 border-b border-slate-100 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                     <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center text-primary-600 font-bold text-sm">
+                       {doctor.name.split(' ').slice(1).map((n: string) => n[0]).join('')}
+                     </div>
                      <div>
-                       <p className="text-xs text-blue-500 font-bold uppercase tracking-wider mb-1">In Consultation</p>
-                       <p className="font-semibold text-gray-900">Token #42</p>
+                       <h4 className="font-bold text-slate-900 text-sm">{doctor.name}</h4>
+                       <p className="text-xs text-primary-600 font-semibold">{doctor.specialization}</p>
                      </div>
-                     <div className="text-right">
-                       <p className="text-sm text-gray-500">Started</p>
-                       <p className="font-medium text-gray-900">10:15 AM</p>
-                     </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full border border-green-200">
+                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                     <span className="text-green-700 text-[10px] font-bold uppercase">Active</span>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-slate-50/50">
+                   <div className="flex justify-between items-center mb-3 bg-white p-2.5 rounded-lg border border-slate-100 text-xs">
+                     <span className="text-slate-600 font-semibold flex items-center gap-1.5">
+                       <Users className="w-3.5 h-3.5 text-slate-400" /> {docApts.length} Patients
+                     </span>
+                     <span className="text-slate-600 font-semibold flex items-center gap-1.5">
+                       <Clock className="w-3.5 h-3.5 text-slate-400" /> {Math.round(doctor.avgConsultationTime / 60)}m avg
+                     </span>
                    </div>
-                 </div>
+                   
+                   <div className="space-y-2">
+                     {docApts.map((apt: any, idx: number) => (
+                       <div key={apt.id} className={`bg-white rounded-lg p-3 border text-sm ${idx === 0 ? 'border-primary-200 shadow-sm' : 'border-slate-100'}`}>
+                         <div className="flex justify-between items-center">
+                           <div>
+                             <p className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${idx === 0 ? 'text-primary-500' : 'text-slate-400'}`}>
+                               {idx === 0 ? '● In Queue (Next)' : `Waiting #${idx + 1}`}
+                             </p>
+                             <p className="font-bold text-slate-900">Token <span className="text-primary-600">#{apt.tokenNumber}</span> — {apt.patient.name}</p>
+                           </div>
+                           <div className="text-right">
+                             <p className="text-[10px] font-semibold text-slate-400 uppercase">Time</p>
+                             <p className="font-semibold text-slate-700">{new Date(apt.slotTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                           </div>
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                </div>
+              </motion.div>
+            ))}
 
-                 {/* Next in Line */}
-                 <div className="bg-white rounded-xl p-3 border border-gray-100 flex justify-between items-center">
-                   <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-sm font-bold text-gray-600">
-                        #43
-                      </div>
-                      <span className="font-medium text-gray-700">Next in line</span>
-                   </div>
-                   <span className="text-sm font-semibold text-primary-600">ETA: 5m</span>
-                 </div>
+            {doctorMap.size === 0 && (
+              <div className="col-span-full text-center py-16 text-slate-400">
+                <Activity className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                <p className="font-semibold">No appointments today</p>
               </div>
-            </motion.div>
-
+            )}
           </div>
+          )}
         </div>
       </main>
     </div>
   );
 };
 
+const LoginScreen = ({ onLogin, roleContext }: { onLogin: (user: any) => void, roleContext: 'DOCTOR' | 'STAFF' }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/auth/staff/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, type: roleContext }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Login failed');
+      onLogin(data);
+    } catch (err: any) { setError(err.message); }
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Reception Dashboard</h2>
+        <p className="text-slate-500 mb-6 text-sm">Please sign in to access the active queues.</p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div><label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Email</label><input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-primary-500 focus:bg-white text-sm" placeholder="reception@hospital.com"/></div>
+          <div><label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Password</label><input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-primary-500 focus:bg-white text-sm" placeholder="••••••••"/></div>
+          {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
+          <button disabled={loading} type="submit" className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md">{loading ? 'Verifying...' : 'Sign In'}</button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 function App() {
+  const [authData, setAuthData] = useState<any>(() => {
+    const saved = localStorage.getItem('medi_reception_auth');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const handleLogin = (data: any) => {
+    localStorage.setItem('medi_reception_auth', JSON.stringify(data));
+    setAuthData(data);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('medi_reception_auth');
+    setAuthData(null);
+  };
+
+  if (!authData) {
+    return <LoginScreen onLogin={handleLogin} roleContext="STAFF" />;
+  }
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard handleLogout={handleLogout} />} />
       </Routes>
     </Router>
   );

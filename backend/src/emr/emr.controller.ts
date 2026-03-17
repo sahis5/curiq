@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { EmrService } from './emr.service';
 import { BillingService } from '../billing/billing.service';
 
@@ -8,6 +8,11 @@ export class EmrController {
     private readonly emrService: EmrService,
     private readonly billingService: BillingService
   ) {}
+
+  @Get('patient/:id')
+  async getPatientEmr(@Param('id') patientId: string) {
+    return this.emrService.getPatientHistory(patientId);
+  }
 
   @Post()
   async create(@Body() createDto: { 
@@ -38,3 +43,4 @@ export class EmrController {
     return emrRecord;
   }
 }
+

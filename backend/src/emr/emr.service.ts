@@ -5,14 +5,14 @@ import { PrismaService } from '../prisma/prisma.service';
 export class EmrService {
   constructor(private prisma: PrismaService) {}
 
-  async createEmrRecord(patientId: string, doctorId: string, soapNotes: string, icd10Code: string, vitals: any) {
+  async createEmrRecord(patientId: string, doctorId: string, soapNotes: string, vitals: any, icd10Codes: string[]) {
     // Save record to Primary Postgres
     return this.prisma.emrRecord.create({
       data: {
         patientId,
         doctorId,
         soapNotes,
-        icd10Code,
+        icd10Code: Array.isArray(icd10Codes) ? icd10Codes.join(', ') : (icd10Codes || ''),
         vitalsJson: vitals
       }
     });

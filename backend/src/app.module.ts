@@ -12,9 +12,15 @@ import { BillingModule } from './billing/billing.module';
 import { NotificationModule } from './notification/notification.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { BookingModule } from './booking/booking.module';
+import { StaffModule } from './staff/staff.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
-  imports: [AuthModule, QueueModule, PrismaModule, AppointmentModule, EmrModule, PrescriptionModule, LabModule, BillingModule, NotificationModule, AnalyticsModule, BookingModule],
+  imports: [
+    AuthModule, QueueModule, PrismaModule, AppointmentModule, EmrModule, 
+    PrescriptionModule, LabModule, BillingModule, NotificationModule, 
+    AnalyticsModule, BookingModule, StaffModule, AiModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

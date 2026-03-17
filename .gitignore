@@ -1,4 +1,14 @@
 node_modules/
 .env
 dist/
-
+build/
+*.log
+__pycache__/
+.DS_Store
+*.local
+.npm
+.cache
+coverage/
+.next/
+.turbo/
+.vercel/

@@ -25,6 +25,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-socket.io": "^10.4.22",
     "@nestjs/schedule": "^6.1.1",
     "@nestjs/websockets": "^10.4.22",
     "@prisma/client": "^6.19.2",
@@ -74,5 +75,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }
